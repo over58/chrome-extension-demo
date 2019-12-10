@@ -3,10 +3,11 @@ chrome.runtime.onInstalled.addListener(function() {
   chrome.contextMenus.create({
     title: "测试右键菜单",
     onclick: function() {
+      // 这种方式在回调里面调用吧，暂时不能在background.js中直接调用
       chrome.notifications.create('', {
         type: "basic",
         iconUrl: "icons/icon_48.png",
-        title: "这是标题",
+        title: "这是标题aaaaa",
         message: "您刚才点击了自定义右键菜单！"
       });
     }
@@ -71,7 +72,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
   sendMessageToContentScript({
     from: "popup",
     to: "content",
-    data: activeInfogo
+    data: activeInfo
   });
 });
 
@@ -82,3 +83,16 @@ function sendMessageToContentScript(message, callback) {
     });
   });
 }
+
+function sendNotification(message, options){
+  if('Notification' in window) {
+    // ！！！一定要查看chrome或者系统是不是已经将通知给禁掉了
+    Notification.requestPermission()
+    new Notification(message, options);
+  }
+}
+
+sendNotification('欢迎来到我的chrome-extension', {
+  body: '内容主体',
+  icon: './icons/icon_128.png'
+})
