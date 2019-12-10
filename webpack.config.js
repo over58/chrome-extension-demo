@@ -9,79 +9,81 @@ const { version } = require('./package.json');
 
 const config = {
   mode: process.env.NODE_ENV,
-  context: __dirname + '/src',
+  context: __dirname + "/src",
   entry: {
-    'background': './background.js',
-    'popup/popup': './popup/popup.js',
-    'tab/tab': './tab/tab.js',
+    background: "./background.js",
+    "popup/popup": "./popup/popup.js",
+    "tab/tab": "./tab/tab.js",
+    "content": "./content.js"
   },
   output: {
-    path: __dirname + '/dist',
-    filename: '[name].js',
+    path: __dirname + "/dist",
+    filename: "[name].js"
   },
   resolve: {
-    extensions: ['.js', '.vue'],
+    extensions: [".js", ".vue"]
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
-        loaders: 'vue-loader',
+        loaders: "vue-loader"
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
+        loader: "babel-loader",
+        exclude: /node_modules/
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, "css-loader"]
       },
       {
-        test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        test: /\.less$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "less-loader"]
       },
       {
-        test: /\.sass$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader?indentedSyntax'],
-      },
-      {
-        test: /\.(png|jpg|gif|svg|ico)$/,
-        loader: 'file-loader',
+        test: /\.(png|jpg|gif|svg|ico|ttf|woff)$/,
+        loader: "file-loader",
         options: {
-          name: '[name].[ext]?emitFile=false',
-        },
-      },
-    ],
+          name: "[name].[ext]?emitFile=false"
+        }
+      }
+    ]
   },
   plugins: [
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: "[name].css"
     }),
     new CopyWebpackPlugin([
-      { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
-      { from: 'popup/popup.html', to: 'popup/popup.html', transform: transformHtml },
-      { from: 'tab/tab.html', to: 'tab/tab.html', transform: transformHtml },
+      { from: "icons", to: "icons", ignore: ["icon.xcf"] },
       {
-        from: 'manifest.json',
-        to: 'manifest.json',
-        transform: (content) => {
+        from: "popup/popup.html",
+        to: "popup/popup.html",
+        transform: transformHtml
+      },
+      { from: "tab/tab.html", to: "tab/tab.html", transform: transformHtml },
+      {
+        from: "manifest.json",
+        to: "manifest.json",
+        transform: content => {
           const jsonContent = JSON.parse(content);
           jsonContent.version = version;
 
-          if (config.mode === 'development') {
-            jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'";
+          if (config.mode === "development") {
+            jsonContent["content_security_policy"] =
+              "script-src 'self' 'unsafe-eval'; object-src 'self'";
           }
 
           return JSON.stringify(jsonContent, null, 2);
-        },
-      },
+        }
+      }
     ]),
     new WebpackShellPlugin({
-      onBuildEnd: ['node scripts/remove-evals.js'],
-    }),
-  ],
+      onBuildEnd: ["node scripts/remove-evals.js"]
+    })
+  ]
 };
 
 if (config.mode === 'production') {

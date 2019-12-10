@@ -9,8 +9,15 @@
   },
   "browser_action": {
     "default_title": "new-tab-page",
+    "default_icon": "icons/icon_48.png",
     "default_popup": "popup/popup.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["./content.js"]
+    }
+  ],
   "background": {
     "scripts": [
       "background.js"
@@ -20,6 +27,11 @@
     "newtab": "tab/tab.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "notifications",
+    "contextMenus",
+    "bookmarks",
+    "tabs",
+    "activeTab"
   ]
 }
