@@ -14,7 +14,9 @@ const config = {
     background: "./background.js",
     "popup/popup": "./popup/popup.js",
     "tab/tab": "./tab/tab.js",
-    "content": "./content.js"
+    content: "./content.js",
+    inject: "./inject.css",
+    injectJs: "./injectJs.js"
   },
   output: {
     path: __dirname + "/dist",

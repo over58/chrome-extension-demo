@@ -83,6 +83,17 @@
           
         </el-form>
       </el-tab-pane>
+      <el-tab-pane label="注入script/css" name="inject">
+        <el-form label-width="script">
+          <el-form-item label="创建标签页">
+            <el-button type="primary" size="small" @click="injectScript">注入script</el-button>  
+          </el-form-item>
+          <el-form-item label="css">
+            <el-button type="primary" size="small" @click="injectCss">注入css</el-button>
+          </el-form-item>
+          
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -252,6 +263,21 @@ export default {
     setZoom() {
       this.getActiveTab().then(tabs => {
         chrome.tabs.setZoom(tabs[0].id, vm.zoom)
+      })
+    },
+    injectCss () {
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.insertCSS(tabs[0].id, {file: './inject.css'});
+      }, function(){
+        alert('insert fallback')
+      })
+    },
+    injectScript () {
+      this.getActiveTab().then(tabs => {
+        // 注意引入文件的路径一定得和打包后的路径对应上
+        chrome.tabs.executeScript(tabs[0].id, {
+          file: './injectJs.js'
+        })
       })
     }
   },

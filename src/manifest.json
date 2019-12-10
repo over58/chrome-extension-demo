@@ -33,5 +33,9 @@
     "bookmarks",
     "tabs",
     "activeTab"
+  ],
+  "web_accessible_resources": [
+    "./inject.css", 
+    "./injectJs.js"
   ]
 }
