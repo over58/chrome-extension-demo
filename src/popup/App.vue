@@ -55,12 +55,33 @@
             </el-input>
           </el-form-item>
           <el-form-item label="关闭当前页">
-            <el-button type="primary" size="small" @click="closeTab">关闭当前页</el-button>
-            
+            <el-button type="primary" size="small" @click="closeWindow">关闭当前页</el-button>
           </el-form-item>
         </el-form>
-        
-        
+      </el-tab-pane>
+      <el-tab-pane label="标签页操作" name="tabs">
+        <el-form label-width="100px">
+          <el-form-item label="创建标签页">
+            <el-button type="primary" size="small" @click="createTab">创建标签页</el-button>  
+          </el-form-item>
+          <el-form-item label="关闭标签页">
+            <el-button type="primary" size="small" @click="closeTab">关闭标签页</el-button>
+          </el-form-item>
+          <el-form-item label="reload">
+            <el-button type="primary" size="small" @click="reloadTab">reload标签页</el-button>
+          </el-form-item>
+          <el-form-item label="discard">
+            <el-button type="primary" size="small" @click="discardTab">discard丢弃标签页</el-button>
+          </el-form-item>
+          <el-form-item label="getZoom">
+            <el-button type="primary" size="small" @click="getZoom">getZoom</el-button>
+          </el-form-item>
+          <el-form-item label="setZoom">
+            <el-input-number v-model="zoom" :min="1" :max="10"></el-input-number>
+            <el-button type="primary" size="small" @click="setZoom">setZoom</el-button>
+          </el-form-item>
+          
+        </el-form>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -96,13 +117,17 @@ export default {
           label: '全屏',
           value: 'fullscreen'
         }
-      ]
+      ],
+      zoom: 1
     };
   },
   created(){
     chrome.runtime.onMessage.addListener(function(req) {
       alert(req);
     });
+  },
+  mounted () {
+    
   },
   methods: {
     changeBadge(status) {
@@ -188,10 +213,45 @@ export default {
         alert('创建成功')
       })
     },
-    closeTab(){
+    closeWindow(){
       // chrome.windows。getCurrent  可以获取到当前window
       chrome.windows.getCurrent({}, currentWindow => {
         chrome.windows.remove(currentWindow.id)
+      })
+    },
+    createTab() {
+      chrome.windows.getCurrent(currentWindow => {
+        chrome.tabs.create({
+          windowId: currentWindow.id,
+          url: 'http://www.baidu.com'
+        })
+      })
+    },
+    closeTab () {
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.remove(tabs.map(x =>x.id))
+      })
+    },
+    reloadTab() {
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.reload(tabs[0].id)
+      })
+    },
+    discardTab(){
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.discard(tabs[0].id)
+      })
+    },
+    getZoom() {
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.getZoom(tabs[0].id, function(zoom){
+          alert(zoom)
+        })
+      })
+    },
+    setZoom() {
+      this.getActiveTab().then(tabs => {
+        chrome.tabs.setZoom(tabs[0].id, vm.zoom)
       })
     }
   },

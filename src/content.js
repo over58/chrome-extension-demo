@@ -1,9 +1,8 @@
 console.log('content')
-chrome.runtime.onMessage.addListener((req, sender, res) => {
+chrome.runtime.onMessage.addListener((req, sender, setResponse) => {
   console.log('收到一条消息...')
-  console.table(req, sender, res)
-  switch (req.type) {
-  }
+  console.table(req, sender)
+  setResponse('我收到了消息')
 })
 
 

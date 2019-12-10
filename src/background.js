@@ -53,19 +53,6 @@ function notify(){
   );
 }
 
-
-chrome.tabs.onActivated.addListener(function(obj) {
-  // console.log('active tab改变', obj)
-  chrome.runtime.sendMessage({
-    type: "onActivated",
-    data: obj
-  });
-  // chrome.tabs.sendMessage(obj.tabId, {
-  //   type: "onActivated",
-  //   data: obj
-  // });
-});
-
 chrome.tabs.onCreated.addListener(function(obj) {
   console.log("onCreated");
 });
@@ -77,4 +64,21 @@ function getActiveTab () {
       resolve(tabs)
     })
   })
+}
+
+// 当活动tab改变的时候，就往content-script发送一条消息
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+  sendMessageToContentScript({
+    from: "popup",
+    to: "content",
+    data: activeInfogo
+  });
+});
+
+function sendMessageToContentScript(message, callback) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+      if (callback) callback(response);
+    });
+  });
 }
