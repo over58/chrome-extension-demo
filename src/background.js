@@ -84,6 +84,7 @@ function sendMessageToContentScript(message, callback) {
   });
 }
 
+// 发送notification
 function sendNotification(message, options){
   if('Notification' in window) {
     // ！！！一定要查看chrome或者系统是不是已经将通知给禁掉了
@@ -96,3 +97,65 @@ sendNotification('欢迎来到我的chrome-extension', {
   body: '内容主体',
   icon: './icons/icon_128.png'
 })
+
+// 监听地址栏改变给出建议
+chrome.omnibox.onInputChanged.addListener((text, suggesst) => {
+  console.log('onInputChanged' + text)
+  if(!text) return
+  if (text === "美女") {
+    suggesst([
+      { content: "中国" + text, description: "你要找“中国美女”吗？" },
+      { content: "日本" + text, description: "你要找“日本美女”吗？" },
+      { content: "泰国" + text, description: "你要找“泰国美女或人妖”吗？" },
+      { content: "韩国" + text, description: "你要找“韩国美女”吗？" }
+    ]);
+  } else if (text == "微博") {
+    suggest([
+      { content: "新浪" + text, description: "新浪" + text },
+      { content: "腾讯" + text, description: "腾讯" + text },
+      { content: "搜狐" + text, description: "搜索" + text }
+    ]);
+  } else {
+    suggest([
+      { content: "百度搜索 " + text, description: "百度搜索 " + text },
+      { content: "谷歌搜索 " + text, description: "谷歌搜索 " + text }
+    ]);
+  }
+})
+
+// 用户接受关键字建议
+chrome.omnibox.onInputEntered.addListener((text) => {
+  // 这里的text就是suggest中的content
+  console.log('onInputEntered' + text)
+  if(!text) return 
+  var href = ''
+  if (text.endsWith("美女"))
+    href =
+      "http://image.baidu.com/search/index?tn=baiduimage&ie=utf-8&word=" + text;
+  else if (text.startsWith("百度搜索"))
+    href =
+      "https://www.baidu.com/s?ie=UTF-8&wd=" + text.replace("百度搜索 ", "");
+  else if (text.startsWith("谷歌搜索"))
+    href =
+      "https://www.google.com.tw/search?q=" + text.replace("谷歌搜索 ", "");
+  else href = "https://www.baidu.com/s?ie=UTF-8&wd=" + text;
+
+  openUrlCurrentTab(href)
+})
+
+
+// 当前标签打开某个链接
+function openUrlCurrentTab(url)
+{
+	getCurrentTabId(tabId => {
+		chrome.tabs.update(tabId, {url: url});
+	})
+}
+
+function getCurrentTabId(callback){
+  chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+    if(callback) {
+      callback(tabs.length ? tabs[0].id : null)
+    }
+  })
+}

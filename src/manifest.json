@@ -26,6 +26,9 @@
   "chrome_url_overrides": {
     "newtab": "tab/tab.html"
   },
+  "omnibox": {
+    "keyword": "demo"
+  },
   "permissions": [
     "storage",
     "notifications",
